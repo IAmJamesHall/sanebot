@@ -41,6 +41,7 @@ for (const file of commandFiles) {
 	}
 }
 
+//listen for commands, then run the required command
 client.on(Events.InteractionCreate, async interaction => {
 	const command = interaction.client.commands.get(interaction.commandName);
 
