@@ -7,7 +7,7 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.reply(`Hi! Here's message #1`);
 		for (let i = 2; i <= 20; i++ ) {
-			await interaction.followUp(`Hi! Here's message #${i}`);
+			await interaction.followUp(`Hi! Here's message #${i}, bro`);
 		}
 	},
 };

@@ -15,7 +15,7 @@ module.exports = {
     } while (fetched.size >= 2);
 
     await interaction.reply('Welcome to your clear channel :)')
-    await setTimeout(async (interaction) => {}, 3000); //this line appears to do nothing. idk why. it's supposed to pause 3 seconds
+    //maybe put a 3-second delay in here, for fun
     await interaction.deleteReply();
   },
 };
