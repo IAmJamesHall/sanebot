@@ -10,6 +10,7 @@ client.login(token);
 
 
 
+//basic logging to the sanebot channel
 module.exports.sendMessage = (message) => {
   // When the client is ready, run this code (only once)
   // We use 'c' for the event parameter to keep it separate from the already defined 'client'
@@ -22,6 +23,8 @@ module.exports.sendMessage = (message) => {
   });
 };
 
+
+// pull in commands from ./commands folder
 client.commands = new Collection();
 
 const commandsPath = path.join(__dirname, 'commands');
