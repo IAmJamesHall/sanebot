@@ -10,8 +10,8 @@ client.login(token);
 
 
 
-//basic logging to the sanebot channel
-module.exports.sendMessage = (message) => {
+// basic logging to the sanebot channel
+const discordLog = (message) => {
   // When the client is ready, run this code (only once)
   // We use 'c' for the event parameter to keep it separate from the already defined 'client'
   client.once(Events.ClientReady, (c) => {
@@ -58,3 +58,6 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 
 });
+
+
+module.exports = discordLog;

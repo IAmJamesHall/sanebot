@@ -16,6 +16,7 @@ function openInbox(cb) {
   imap.openBox('INBOX', true, cb);
 }
 
+//TODO: clean up this function
 imap.once('ready', function() {
   openInbox(function(err, box) {
     if (err) throw err;
@@ -32,7 +33,7 @@ imap.once('ready', function() {
           buffer += chunk.toString('utf8');
         });
         stream.once('end', function() {
-          console.log(prefix + 'Parsed header: %s', String(Imap.parseHeader(buffer))); //TODO: clean this line up.
+          console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer))); //TODO: clean this line up especially
         //   console.log(prefix + 'Email Address: %s', inspect(Imap.parseHeader(buffer).from))
         });
       });

@@ -2,7 +2,8 @@
   "dependencies": {
     "discord.js": "^14.7.1",
     "imap": "^0.8.19",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "openai": "^3.1.0"
   },
   "name": "sanebot",
   "version": "1.0.0",
