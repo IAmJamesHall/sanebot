@@ -30,6 +30,7 @@ module.exports.createClient = () => {
 // };
 
 // basic logging to the sanebot channel
+//TODO: rewrite this so it can run multiple times (ex above)
 module.exports.discordLog = (message, client) => {
 	//   const sanebotChannel = client.channels.cache.find(
 	// 	(i) => i.name === "sanebot"
