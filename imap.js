@@ -1,65 +1,79 @@
-var Imap = require('imap'),
-    inspect = require('util').inspect;
+module.exports.getTenEmailHeaders = () => {
+  var Imap = require("imap"),
+    inspect = require("util").inspect;
 
+  const { emailAddress, emailPassword, emailServer } = require("./config.json");
 
-const { emailAddress, emailPassword, emailServer } = require("./config.json");
- 
-var imap = new Imap({
-  user: emailAddress,
-  password: emailPassword,
-  host: emailServer,
-  port: 993,
-  tls: true
-});
- 
-function openInbox(cb) {
-  imap.openBox('INBOX', true, cb);
-}
+  var imap = new Imap({
+    user: emailAddress,
+    password: emailPassword,
+    host: emailServer,
+    port: 993,
+    tls: true,
+  });
 
-//TODO: clean up this function
-imap.once('ready', function() {
-  openInbox(function(err, box) {
-    if (err) throw err;
-    var f = imap.seq.fetch('1:10', {
-      bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)',
-      struct: true
-    });
-    f.on('message', function(msg, seqno) {
-      console.log('Message #%d', seqno);
-      var prefix = '(#' + seqno + ') ';
-      msg.on('body', function(stream, info) {
-        var buffer = '';
-        stream.on('data', function(chunk) {
-          buffer += chunk.toString('utf8');
+  const headers = [];
+
+  function openInbox(cb) {
+    imap.openBox("INBOX", true, cb);
+  }
+
+  //TODO: clean up this function
+  imap.once("ready", function () {
+    
+    openInbox(function (err, box) {
+      
+      if (err) throw err;
+      var f = imap.seq.fetch("1:10", {
+        bodies: "HEADER.FIELDS (FROM TO SUBJECT DATE)",
+        struct: true,
+      });
+      f.on("message", function (msg, seqno) {
+        console.log("Message #%d", seqno);
+        var prefix = "(#" + seqno + ") ";
+        msg.on("body", function (stream, info) {
+          var buffer = "";
+          stream.on("data", function (chunk) {
+            buffer += chunk.toString("utf8");
+          });
+          stream.once("end", function () {
+            headers.push(inspect(Imap.parseHeader(buffer)));
+            console.log('pushed');
+          });
         });
-        stream.once('end', function() {
-          console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer))); //TODO: clean this line up especially
-        //   console.log(prefix + 'Email Address: %s', inspect(Imap.parseHeader(buffer).from))
+        msg.once("attributes", function (attrs) {
+          // console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
+        });
+        msg.once("end", function () {
+          console.log(prefix + "Finished");
         });
       });
-      msg.once('attributes', function(attrs) {
-        // console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
+      f.once("error", function (err) {
+        console.log("Fetch error: " + err);
       });
-      msg.once('end', function() {
-        console.log(prefix + 'Finished');
+      f.once("end", function () {
+        console.log("Done fetching all messages!");
+        imap.end();
       });
-    });
-    f.once('error', function(err) {
-      console.log('Fetch error: ' + err);
-    });
-    f.once('end', function() {
-      console.log('Done fetching all messages!');
-      imap.end();
     });
   });
-});
- 
-imap.once('error', function(err) {
-  console.log(err);
-});
- 
-imap.once('end', function() {
-  console.log('Connection ended');
-});
- 
-imap.connect();
+
+  imap.once("error", function (err) {
+    console.log(err);
+  });
+
+  return function returnHeaders () {
+    console.log('trying to return headers')
+    return headers;
+  }
+
+  imap.once("end", function () {
+    console.log("Connection ended");
+    returnHeaders();
+  });
+
+  imap.connect();
+
+
+  
+};
