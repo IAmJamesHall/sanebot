@@ -1,29 +1,45 @@
 const fs = require('node:fs');
 const path = require('node:path');
 // Require the necessary discord.js classes
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const { token } = require("./config.json");
-
-// Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-client.login(token);
 
 
+
+module.exports.createClient = () => {
+	const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+	const { token } = require("./config.json");
+
+	// Create a new client instance
+	const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+	client.login(token);
+	return client;
+}
+
+
+// // basic logging to the sanebot channel
+// module.exports.discordLog = (message, client) => {
+//   const { Events } = require('discord.js');
+//   // When the client is ready, run this code (only once)
+//   // We use 'c' for the event parameter to keep it separate from the already defined 'client'
+//   client.once(Events.ClientReady, (c) => {
+//     console.log(`Ready! Logged in as ${c.user.tag}`);
+//     const sanebotChannel = c.channels.cache.find(
+//       (i) => i.name === "sanebot"
+//     ).id;
+//     c.channels.cache.get(sanebotChannel).send(message);
+//   });
+// };
 
 // basic logging to the sanebot channel
-const discordLog = (message) => {
-  // When the client is ready, run this code (only once)
-  // We use 'c' for the event parameter to keep it separate from the already defined 'client'
-  client.once(Events.ClientReady, (c) => {
-    console.log(`Ready! Logged in as ${c.user.tag}`);
-    const sanebotChannel = c.channels.cache.find(
-      (i) => i.name === "sanebot"
-    ).id;
-    c.channels.cache.get(sanebotChannel).send(message);
-  });
-};
+module.exports.discordLog = (message, client) => {
+	//   const sanebotChannel = client.channels.cache.find(
+	// 	(i) => i.name === "sanebot"
+	//   ).id;
+	  client.channels.cache.get('1069883537454551100').send(message);
 
+  };
 
+module.exports.setUpServerCommands = (client) => {
+  const { Collection, Events } = require('discord.js');
 // pull in commands from ./commands folder
 client.commands = new Collection();
 
@@ -58,6 +74,4 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 
 });
-
-
-module.exports = discordLog;
+}
