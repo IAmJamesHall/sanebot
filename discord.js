@@ -4,13 +4,12 @@ const path = require('node:path');
 
 
 
-module.exports.createClient = () => {
+module.exports.createClient = async () => {
 	const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-	const { token } = require("./config.json");
-
+	const token = require('./config.json').token;
 	// Create a new client instance
 	const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-	client.login(token);
+	await client.login(token);
 	return client;
 }
 
@@ -35,7 +34,11 @@ module.exports.discordLog = (message, client) => {
 	//   const sanebotChannel = client.channels.cache.find(
 	// 	(i) => i.name === "sanebot"
 	//   ).id;
-	  client.channels.cache.get('1069883537454551100').send(message);
+	  // Get the channel by its ID
+	const channel = client.channels.cache.get('1069883537454551100');
+
+	// Send the message
+	channel.send('Hello there!');
 
   };
 
