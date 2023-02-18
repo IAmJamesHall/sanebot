@@ -1,7 +1,7 @@
 const { createClient, discordLog, setUpServerCommands } = require('./discord');
 const classifyEmail = require("./gpt");
 const { getTenEmailHeaders } = require('./imap');
-const { token } = require('./config.json');
+const { createAddress } = require('./db');
 
 const { inspect } = require("util"); //used for turning js object to string
 
