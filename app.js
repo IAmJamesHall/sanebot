@@ -3,6 +3,8 @@ const classifyEmail = require("./gpt");
 const { getTenEmailHeaders } = require('./imap');
 const { token } = require('./config.json');
 
+const { inspect } = require("util"); //used for turning js object to string
+
 
 setUpServerCommands();
 
@@ -12,19 +14,12 @@ setUpServerCommands();
 
 const stuff = async () => {
     const headers = await getTenEmailHeaders();
-    // headers.forEach(async (header) => {
-    //     const classification = await classifyEmail(header)
-    //     discordLog(`${header}, ${classification}`)
-    // });
-    console.log(headers);
-    // const classification = await classifyEmail(`{
-    // date: [ 'Mon, 28 Nov 2022 22:48:18 +0000' ],
-    // to: [ 'James Hall <hi@jameshall.xyz>' ],
-    // from: [ 'Apex Hosting <support@apexminecrafthosting.com>' ],
-    // subject: [ 'Order Confirmation' ]
-    // }`);
-
-    // discordLog(`support@apexminecrafthosting.com: ${classification}`)
+    headers.forEach(async (header) => {
+        const classification = await classifyEmail(inspect(header))
+        const email = 
+        discordLog(`${header.from}, ${classification}`)
+        console.log(`${header.from}, ${classification}`)
+    });
 };
 
 stuff();
