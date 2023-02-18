@@ -1,5 +1,4 @@
-module.exports.createClient = () => {};
-
+//TODO: migrate this function to 'axios'
 // basic logging to the sanebot channel using a webhook
 module.exports.discordLog = (message) => {
   const request = require("request");
