@@ -1,10 +1,16 @@
+const Imap = require("imap");
+const { emailAddress, emailPassword, emailServer } = require("./config.json");
+
+/**
+ * Fetches the headers of the 10 most recent emails in the INBOX folder of an IMAP account.
+ * 
+ * @async
+ * @returns {Promise<Array<{ from: string, subject: string }>>} - Promise that resolves to an array of objects containing email headers
+ * @throws {Error} - If there was an error connecting to the email account or fetching headers
+ */
 module.exports.getTenEmailHeaders = () => {
-  var Imap = require("imap"),
-    inspect = require("util").inspect;
-
-  const { emailAddress, emailPassword, emailServer } = require("./config.json");
-
-  var imap = new Imap({
+  // Create new instance of Imap object using configuration from config.json
+  const imap = new Imap({
     user: emailAddress,
     password: emailPassword,
     host: emailServer,
@@ -12,68 +18,57 @@ module.exports.getTenEmailHeaders = () => {
     tls: true,
   });
 
-  const headers = [];
+  // Create new Promise that resolves to an array of email headers
+  return new Promise((resolve, reject) => {
+    const headers = [];
 
-  function openInbox(cb) {
-    imap.openBox("INBOX", true, cb);
-  }
+    // Helper function to open the inbox mailbox
+    function openInbox(cb) {
+      imap.openBox("INBOX", true, cb);
+    }
 
-  //TODO: clean up this function
-  imap.once("ready", function () {
-    
-    openInbox(function (err, box) {
-      
-      if (err) throw err;
-      var f = imap.seq.fetch("1:10", {
-        bodies: "HEADER.FIELDS (FROM TO SUBJECT DATE)",
-        struct: true,
-      });
-      f.on("message", function (msg, seqno) {
-        console.log("Message #%d", seqno);
-        var prefix = "(#" + seqno + ") ";
-        msg.on("body", function (stream, info) {
-          var buffer = "";
-          stream.on("data", function (chunk) {
-            buffer += chunk.toString("utf8");
+    // When the Imap object is ready, open the inbox mailbox and fetch the headers of the first 10 emails
+    imap.once("ready", function () {
+      openInbox(function (err, box) {
+        if (err) return reject(err);
+
+        const f = imap.seq.fetch("1:10", {
+          bodies: "HEADER.FIELDS (FROM TO SUBJECT DATE)",
+          struct: true,
+        });
+
+        // For each email, parse its header and add it to the headers array
+        f.on("message", function (msg, seqno) {
+          const prefix = "(#" + seqno + ") ";
+
+          msg.on("body", function (stream, info) {
+            let buffer = "";
+            stream.on("data", function (chunk) {
+              buffer += chunk.toString("utf8");
+            });
+
+            stream.once("end", function () {
+              const header = Imap.parseHeader(buffer);
+              headers.push({ from: header.from, subject: header.subject });
+            });
           });
-          stream.once("end", function () {
-            headers.push(inspect(Imap.parseHeader(buffer)));
-            console.log('pushed');
-          });
         });
-        msg.once("attributes", function (attrs) {
-          // console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
+
+        // When all emails have been processed, resolve the Promise with the headers array and close the connection to the mailbox
+        f.once("end", function () {
+          imap.end();
+          resolve(headers);
         });
-        msg.once("end", function () {
-          console.log(prefix + "Finished");
-        });
-      });
-      f.once("error", function (err) {
-        console.log("Fetch error: " + err);
-      });
-      f.once("end", function () {
-        console.log("Done fetching all messages!");
-        imap.end();
       });
     });
+
+    // If there is an error, reject the Promise and close the connection to the mailbox
+    imap.once("error", function (err) {
+      reject(err);
+      imap.end();
+    });
+
+    // Connect to the mailbox to start the fetching process
+    imap.connect();
   });
-
-  imap.once("error", function (err) {
-    console.log(err);
-  });
-
-  return function returnHeaders () {
-    console.log('trying to return headers')
-    return headers;
-  }
-
-  imap.once("end", function () {
-    console.log("Connection ended");
-    returnHeaders();
-  });
-
-  imap.connect();
-
-
-  
-};
+}
