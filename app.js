@@ -8,18 +8,17 @@ const { inspect } = require("util"); //used for turning js object to string
 
 setUpServerCommands();
 
-// discordLog('hello');
-// discordLog('hi again');
+
 
 
 const stuff = async () => {
     const headers = await getTenEmailHeaders();
-    headers.forEach(async (header) => {
-        const classification = await classifyEmail(inspect(header))
-        const email = 
-        discordLog(`${header.from}, ${classification}`)
-        console.log(`${header.from}, ${classification}`)
-    });
+    for (const header of headers) {
+        const classification = await classifyEmail(inspect(header));
+        discordLog(`${header.from}, ${classification}`);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // add a 1 second delay between messages
+    }
 };
+
 
 stuff();

@@ -10,7 +10,7 @@ const { Client, Collection, GatewayIntentBits } = require("discord.js");
 function discordLog(message) {
   axios.post(discordWebhookURL, { content: message })
     .then(() => {
-      console.log("Message posted to Discord channel");
+      console.log(`Message posted to Discord channel: ${message}`);
     })
     .catch((error) => {
       console.error("Error posting message to Discord channel:", error);
