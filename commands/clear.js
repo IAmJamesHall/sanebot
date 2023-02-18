@@ -1,21 +1,25 @@
-const { SlashCommandBuilder, SelectMenuInteraction } = require("discord.js");
+const { SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("clear")
     .setDescription("Clears the current channel"),
   async execute(interaction) {
-    let fetched;
-    const sanebotChannel = interaction.client.channels.cache.find(
-      (i) => i.name === "sanebot"
-    );
-    do {
-      fetched = await sanebotChannel.messages.fetch({ limit: 100 });
-      sanebotChannel.bulkDelete(fetched);
-    } while (fetched.size >= 2);
+    const channel = interaction.channel;
 
-    await interaction.reply('Welcome to your clear channel :)')
-    //maybe put a 3-second delay in here, for fun
-    await interaction.deleteReply();
+    try {
+      const messages = await channel.messages.fetch({ limit: 100 });
+      await channel.bulkDelete(messages);
+      await interaction.reply("Channel cleared!");
+      setTimeout(() => {
+        interaction.deleteReply();
+      }, 3000);
+    } catch (error) {
+      console.error(error);
+      await interaction.reply({
+        content: "Error clearing channel.",
+        ephemeral: true,
+      });
+    }
   },
 };
