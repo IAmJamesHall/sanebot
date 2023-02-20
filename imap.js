@@ -1,3 +1,19 @@
+/* PLAN:
+// - [ ] in Inbox, frequently fetch all NEW emails (after the date of the stored latest one) 
+//    - categorize and move the email to the correct place. Store the date of the latest on in the db
+// - [ ] from SaneLater, occasionally (like every 30 minutes) pull all the emails and check the address on each of them. if any of them are not in the later category of the db, change it to that
+
+
+What functions do we need?
+fetchEmails(flagsToExclude)
+changeFolder(email) - make sure to remove flag
+applyFlagToEmail
+*/
+
+
+
+
+
 const Imap = require("imap");
 const { emailAddress, emailPassword, emailServer } = require("./config.json");
 
